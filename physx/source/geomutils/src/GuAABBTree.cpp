@@ -26,6 +26,8 @@
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.
 
+
+#define PX_SIMD_DISABLED 1
 #include "GuAABBTreeBounds.h"
 #include "GuAABBTree.h"
 #include "GuAABBTreeBuildStats.h"
@@ -39,7 +41,6 @@ using namespace physx;
 using namespace Gu;
 
 ///////////////////////////////////////////////////////////////////////////////
-
 void AABBTreeBounds::init(PxU32 nbBounds, const PxBounds3* bounds)
 {
 	PX_FREE(mBounds);

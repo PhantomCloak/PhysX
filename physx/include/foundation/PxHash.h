@@ -26,6 +26,7 @@
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.
 
+#define PX_SIMD_DISABLED 1
 #ifndef PX_HASH_H
 #define PX_HASH_H
 
@@ -150,6 +151,36 @@ struct PxHash<const char*>
 		return !Pxstrcmp(string0, string1);
 	}
 };
+
+template <typename F, typename S>
+struct PxHash<PxPair<F, S>>
+{
+  uint32_t operator()(const PxPair<F, S>& pair) const
+  {
+    return PxComputeHash(pair);
+  }
+     bool equal(const PxPair<F, S>& a, const PxPair<F, S>& b) const
+        {
+            // Implement comparison logic here
+            // For example, compare both elements of the pairs:
+            return a.first == b.first && a.second == b.second;
+        }
+};
+
+    template <>
+    struct PxHash<unsigned long>
+    {
+        uint32_t operator()(const unsigned long& key) const
+        {
+            // Assuming that unsigned long should be treated as uint64_t
+            return PxComputeHash(static_cast<uint64_t>(key));
+        }
+
+        bool equal(const unsigned long& a, const unsigned long& b) const
+        {
+            return a == b;
+        }
+    };
 
 #if !PX_DOXYGEN
 } // namespace physx

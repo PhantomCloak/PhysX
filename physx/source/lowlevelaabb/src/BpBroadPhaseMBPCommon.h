@@ -26,6 +26,8 @@
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
+#define PX_SIMD_DISABLED 1
+
 #ifndef BP_BROADPHASE_MBP_COMMON_H
 #define BP_BROADPHASE_MBP_COMMON_H
 

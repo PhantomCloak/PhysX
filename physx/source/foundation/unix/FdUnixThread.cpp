@@ -35,6 +35,9 @@
 #if !PX_APPLE_FAMILY && !PX_ANDROID && !defined(__CYGWIN__) && !PX_EMSCRIPTEN
 #include <bits/local_lim.h> // PTHREAD_STACK_MIN
 #endif
+#if PX_EMSCRIPTEN
+#include <thread>
+#endif
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -178,8 +181,10 @@ void PxThreadImpl::start(uint32_t stackSize, PxRunnable* runnable)
 
 	if(stackSize == 0)
 		stackSize = getDefaultStackSize();
+        printf("Default stack size: %d", stackSize);
 
-#if defined(PTHREAD_STACK_MIN) && !PX_ANDROID
+
+#if defined(PTHREAD_STACK_MIN) && !PX_ANDROID && !defined(__EMSCRIPTEN__)
 	if(stackSize < PTHREAD_STACK_MIN)
 	{
 		PxGetFoundation().error(PxErrorCode::eDEBUG_WARNING, __FILE__, __LINE__,
@@ -198,7 +203,22 @@ void PxThreadImpl::start(uint32_t stackSize, PxRunnable* runnable)
 
 	status = pthread_attr_setstacksize(&attr, stackSize);
 	PX_ASSERT(!status);
-	status = pthread_create(&getThread(this)->thread, &attr, PxThreadStart, this);
+
+        // Debug: Print before creating the thread
+        printf("Creating new thread...\n");
+        printf("Thread function: %p\n", (void*)PxThreadStart);
+        printf("Thread argument: %p\n", (void*)this);
+
+        // Original pthread_create call
+        status = pthread_create(&getThread(this)->thread, &attr, PxThreadStart, this);
+
+        // Debug: Check the return status
+        if (status != 0) {
+                printf("Failed to create thread: %s\n", strerror(status));
+        } else {
+                printf("Thread created successfully. Thread ID: %lu\n", (unsigned long)getThread(this)->thread);
+        }
+
 	PX_ASSERT(!status);
 
 	// wait for thread to startup and write out TID
@@ -279,10 +299,12 @@ void PxThreadImpl::yield()
 
 void PxThreadImpl::yieldProcessor()
 {
-#if (PX_ARM || PX_A64)
-	__asm__ __volatile__("yield");
+#if PX_EMSCRIPTEN
+    std::this_thread::yield(); // Standard C++ way to yield the processor.
+#elif (PX_ARM || PX_A64)
+    __asm__ __volatile__("yield");
 #else
-	__asm__ __volatile__("pause");
+    __asm__ __volatile__("pause");
 #endif
 }
 

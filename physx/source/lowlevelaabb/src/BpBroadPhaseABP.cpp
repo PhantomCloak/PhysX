@@ -26,6 +26,7 @@
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
+#define PX_SIMD_DISABLED 1
 #include "foundation/PxProfiler.h"
 #include "foundation/PxMemory.h"
 #include "foundation/PxBitUtils.h"
